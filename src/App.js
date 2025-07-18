@@ -4,10 +4,15 @@ import Header from './components/Header';
 import ProductGrid from './components/ProductGrid';
 import Cart from './components/Cart';
 import Footer from './components/Footer';
+import { AuthProvider } from './contexts/AuthContext';
+import { useCartPersistence } from './hooks/useCartPersistence';
 
-function App() {
+function AppContent() {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Enable cart persistence
+  useCartPersistence(cartItems, setCartItems);
 
   const addToCart = (product) => {
     setCartItems(prevItems => {
@@ -80,6 +85,14 @@ function App() {
         totalPrice={getTotalPrice()}
       />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

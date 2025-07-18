@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Menu, X, User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import UserAccountDropdown from './UserAccountDropdown';
+import AuthModal from './AuthModal';
 
 const Header = ({ cartItemsCount, onCartClick }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -43,9 +48,16 @@ const Header = ({ cartItemsCount, onCartClick }) => {
             </button>
 
             {/* User Account */}
-            <button className="hidden md:block p-2 text-gray-700 hover:text-primary-600">
-              <User className="h-6 w-6" />
-            </button>
+            {user ? (
+              <UserAccountDropdown />
+            ) : (
+              <button 
+                onClick={() => setIsAuthModalOpen(true)}
+                className="hidden md:block p-2 text-gray-700 hover:text-primary-600"
+              >
+                <User className="h-6 w-6" />
+              </button>
+            )}
 
             {/* Cart */}
             <button
@@ -96,15 +108,28 @@ const Header = ({ cartItemsCount, onCartClick }) => {
               <a href="#" className="text-gray-700 hover:text-primary-600 transition-colors py-2">About</a>
               <a href="#" className="text-gray-700 hover:text-primary-600 transition-colors py-2">Contact</a>
               <div className="border-t border-gray-200 pt-4">
-                <a href="#" className="flex items-center text-gray-700 hover:text-primary-600 transition-colors py-2">
-                  <User className="h-5 w-5 mr-2" />
-                  My Account
-                </a>
+                {user ? (
+                  <UserAccountDropdown />
+                ) : (
+                  <button 
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="flex items-center text-gray-700 hover:text-primary-600 transition-colors py-2"
+                  >
+                    <User className="h-5 w-5 mr-2" />
+                    Sign In
+                  </button>
+                )}
               </div>
             </nav>
           </div>
         )}
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </header>
   );
 };

@@ -1,0 +1,13 @@
+[build]
+  publish = "build"
+  command = "npm run build:netlify"
+
+[build.environment]
+  NPM_FLAGS = "--legacy-peer-deps"
+  GENERATE_SOURCEMAP = "false"
+  CI = "false"
+  
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

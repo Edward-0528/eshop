@@ -1,25 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
 export const useCartPersistence = (cartItems, setCartItems) => {
   const { user } = useAuth()
 
-  // Load cart from database when user logs in
-  useEffect(() => {
-    if (user) {
-      loadCartFromDatabase()
-    }
-  }, [user])
-
-  // Save cart to database when cart changes and user is logged in
-  useEffect(() => {
-    if (user && cartItems.length >= 0) {
-      saveCartToDatabase()
-    }
-  }, [cartItems, user])
-
-  const loadCartFromDatabase = async () => {
+  const loadCartFromDatabase = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('user_carts')
@@ -44,9 +30,9 @@ export const useCartPersistence = (cartItems, setCartItems) => {
     } catch (error) {
       console.error('Error loading cart:', error)
     }
-  }
+  }, [user, setCartItems])
 
-  const saveCartToDatabase = async () => {
+  const saveCartToDatabase = useCallback(async () => {
     try {
       // First, clear existing cart items for this user
       await supabase
@@ -76,7 +62,21 @@ export const useCartPersistence = (cartItems, setCartItems) => {
     } catch (error) {
       console.error('Error saving cart:', error)
     }
-  }
+  }, [cartItems, user])
+
+  // Load cart from database when user logs in
+  useEffect(() => {
+    if (user) {
+      loadCartFromDatabase()
+    }
+  }, [user, loadCartFromDatabase])
+
+  // Save cart to database when cart changes and user is logged in
+  useEffect(() => {
+    if (user && cartItems.length >= 0) {
+      saveCartToDatabase()
+    }
+  }, [cartItems, user, saveCartToDatabase])
 
   return {
     loadCartFromDatabase,
